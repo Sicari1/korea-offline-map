@@ -1,0 +1,64 @@
+<meta charset="utf-8">
+<title>한국 지도 (오프라인)</title>
+<link href="lib/maplibre-gl.css" rel="stylesheet">
+<script src="lib/maplibre-gl.js"></script>
+<script src="lib/pmtiles.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; }
+  #map { width: 100%; height: 100%; }
+  .hint {
+    position: absolute; z-index: 1; left: 10px; bottom: 10px;
+    background: rgba(255,255,255,.85); padding: 4px 8px; border-radius: 5px;
+    font: 11px/1.3 sans-serif; color: #555;
+  }
+  .badge {
+    position: absolute; z-index: 1; right: 10px; top: 10px;
+    background: rgba(255,255,255,.9); padding: 6px 10px; border-radius: 6px;
+    font: 12px/1.4 sans-serif; color: #333; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  }
+</style>
+<div id="map"></div>
+<div class="badge">부울경=원본급 상세 · 그 외=개요</div>
+<div class="hint">드래그 이동 · 휠 확대/축소 · © OpenStreetMap contributors</div>
+<script>
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol("pmtiles", protocol.tile);
+  const O = location.origin;
+
+  fetch("_style.json")
+    .then(r => r.json())
+    .then(style => {
+      // 전국 벡터(개요) 경로 로컬화
+      style.glyphs = O + "/fonts/{fontstack}/{range}.pbf";
+      style.sprite = O + "/style-assets/sprite";
+      style.sources.openmaptiles = { type: "vector", url: "pmtiles://" + O + "/korea.pmtiles" };
+
+      // 라벨 전부 한글(name)로 강제 — 영어 라벨 제거
+      for (const ly of style.layers) {
+        if (ly.layout && ly.layout["text-field"] !== undefined) {
+          ly.layout["text-field"] = ["coalesce", ["get","name:ko"], ["get","name"]];
+        }
+      }
+
+      // 부울경 카토 래스터(원본급)를 위에 오버레이
+      // minzoom: 멀리서(전국 보기) 볼 땐 끄고, 줌인하면 켜서 사각형 경계가 화면 밖으로 빠지게 함
+      style.sources.busan = { type: "raster", url: "pmtiles://" + O + "/busangyeong.pmtiles", tileSize: 256 };
+      style.layers.push({ id: "busan-carto", type: "raster", source: "busan", minzoom: 9 });
+
+      const map = new maplibregl.Map({
+        container: "map",
+        style: style,
+        center: [129.05, 35.16],  // 부산
+        zoom: 11,
+        minZoom: 4, maxZoom: 19
+      });
+      map.addControl(new maplibregl.NavigationControl());
+      map.addControl(new maplibregl.ScaleControl());
+      map.on("error", e => console.error("MAP ERROR:", e && e.error));
+    })
+    .catch(e => {
+      document.body.insertAdjacentHTML("beforeend",
+        "<p style='font:14px sans-serif;padding:20px'>스타일 로드 실패: " + e.message +
+        "<br>(실행.bat 으로 열었는지 확인하세요.)</p>");
+    });
+</script>

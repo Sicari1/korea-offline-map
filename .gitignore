@@ -1,0 +1,12 @@
+# 대용량 데이터 / 바이너리 — GitHub 100MB 제한 초과, 별도 빌드/다운로드
+*.pmtiles
+*.mbtiles
+*.osm.pbf
+*.osc.gz
+*.zip
+*.exe
+
+# OS / 편집기
+.DS_Store
+Thumbs.db
+*~
