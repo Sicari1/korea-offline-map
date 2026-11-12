@@ -57,9 +57,9 @@
 - **함정: `rm` 은 `~/.claude-3/settings.json` deny 규칙(`Bash(rm:*)`)으로 차단됨.** 삭제는 `python3 os.remove` 또는 `find -delete`로 할 것.
 
 ## 핵심 경로
-- 배포 폴더(원본): `~/Seongjin/1_업무/지도/korea-map/`  → Downloads 동기본: `/mnt/c/Users/knbank189/Downloads/korea-map/`
+- 배포 폴더(원본): `~/Seongjin/1_업무/완료/지도/korea-map/`  → Downloads 동기본: `/mnt/c/Users/knbank189/Downloads/korea-map/`
 - 카토 작업장: `~/build_carto/` (openstreetmap-carto, mapnik.xml, render_parallel.py, mbtiles)
-- 변환도구: `~/Seongjin/1_업무/지도/변환도구/` (planetiler.jar, jre21, pmtiles CLI는 build_carto)
+- 변환도구: `~/Seongjin/1_업무/완료/지도/변환도구/` (planetiler.jar, jre21, pmtiles CLI는 build_carto)
 
 ## 실행 / 재현 명령
 ```bash
